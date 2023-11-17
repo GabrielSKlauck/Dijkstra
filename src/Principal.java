@@ -1,3 +1,6 @@
+import com.sun.jdi.connect.Connector;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -8,27 +11,10 @@ import java.util.Queue;
 
 public class Principal {
     public static void main(String[] args) {
-        ArrayList<Integer> Q = new ArrayList<>();
-        ArrayList<Integer> S = new ArrayList<>();
         List<Aresta> listaArestas = null;
-        Grafo grafo = new Grafo();
+        Grafo grafo = iniciaGrafo();
 
-        /*
-        * INICIALIZAÇAO DOS VERTICES JA TENDO O PAI COMO NULO E A DISTANCIA COMO
-        * INFINITA COMO SE FOSSE A IMPLEMENTAÇÃO DO METODO INITIALIZE-SINGLE-SOURCE
-        *  POREM DIRETO NA INSTANCIAÇÃO DO VERTICE
-        * */
-        Vertice v1 = new Vertice("V1", null, Double.POSITIVE_INFINITY);
-
-        Vertice v2 = new Vertice("V2", null, Double.POSITIVE_INFINITY);
-        Vertice v3 = new Vertice("V3", null, Double.POSITIVE_INFINITY);
-        v1.addAresta(new Aresta(9.0, v1, v2));
-        v1.addAresta(new Aresta(3.0, v1, v3));
-        v2.addAresta(new Aresta(1.0, v2, v3));
-
-        grafo.addVertice(v1);
-        grafo.addVertice(v2);
-        grafo.addVertice(v3);
+        System.out.println(grafo.percorre());
 
 
 
@@ -51,25 +37,60 @@ public class Principal {
 
 
 
-    private static ArrayList<String> leArquivo(){
+    /*
+    * Faz a leitura da matriz do arquivo.txt e cria os vertices e arestas respectivas
+    * do grafo
+    * */
+    private static Grafo iniciaGrafo(){
         String texto;
-        ArrayList<String> lista = new ArrayList<>();
+        Grafo grafo = new Grafo();
+        char[] alfa = new char[]{ 'A','B','C','D','E','F','G','H','I','J','K','L',};
+
         try {
             texto = Files.readString(Path.of("Arquivo.txt"), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Nao existe arquivo");
+
         }
+
+        //Organiza o texto do arquivo
         texto = texto.replaceAll("\\(", "")
                 .replaceAll("\\)", "")
-                .replaceAll("\r", "");
+                .replaceAll("\r", "")
+                .replaceAll("\n", " ; ");
 
-        texto = texto.replaceAll("\n", " ");
-        String[] valores = texto.split(" ");
+        String textoItems = texto.replaceAll(" ", "");
 
-        for(int i =0; i < valores.length; i++){
-            lista.add(valores[i]);
+        int qtdVertices = Integer.parseInt(textoItems.charAt(0) + "");
+        textoItems = textoItems.replace(textoItems.substring(0,textoItems.indexOf(";") + 1), "");
+
+        //Cria os todos os vertices
+        for(int i = 0; i < qtdVertices - 1; i++){
+
+            //Inicializa os vertices ja tendo o pai com nullo e o custo para chegar nele como infinito
+            //igual ao metodo INITIALIZE-SINGLE-SOURCE porem feito na instanciaçao dos objetos de vertice
+            Vertice v = new Vertice(alfa[i] + "", null, Double.POSITIVE_INFINITY);
+            grafo.addVertice(v);
         }
-        return lista;
+
+        String[][] matrizCustos = new String[textoItems.indexOf(";")][textoItems.indexOf(";")];
+
+        for(int i = 0; i < matrizCustos.length; i++){
+            for(int j = 0; j < matrizCustos[i].length; j++){
+                if(!(textoItems.charAt(j) == ';')){
+
+                }
+            }
+        }
+
+
+
+        for(int i = 0; i < textoItems.length(); i++){
+            if(!textoItems.equals("I") && !textoItems.equals(("0"))){
+                grafo.getVertices().get(i);
+            }
+        }
+        return grafo;
 
     }
 
@@ -87,10 +108,18 @@ public class Principal {
     }
 
     public static class Grafo{
-        private ArrayList<Vertice> vertices;
+        private ArrayList<Vertice> vertices = new ArrayList<>();
 
         public void addVertice(Vertice v){
-            vertices.add(v);
+            this.vertices.add(v);
+        }
+
+        public String percorre(){
+            String vertice = "";
+            for(Vertice v : this.vertices){
+                vertice += v.id + "\n" + "";
+            }
+            return vertice;
         }
 
         public ArrayList<Vertice> getVertices() {
@@ -155,12 +184,6 @@ public class Principal {
 
         public void addAresta(Aresta aresta){
             this.arestaAdj.add(aresta);
-        }
-
-        public void adicionaAresta(List<Aresta> arestas){
-            for(Aresta item : arestas){
-                this.arestaAdj.add(item);
-            }
         }
 
         public String getId() {
