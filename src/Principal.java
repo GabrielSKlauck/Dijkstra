@@ -59,6 +59,17 @@ public class Principal {
                 .replaceAll("\r", "")
                 .replaceAll("\n", " ; ");
 
+        String[] itens = texto.split(";");
+        String[][] matrizCusto = new String[itens[0].length()][itens[0].length()];
+
+        //Cria matriz de custo
+        for(int i = 0; i < matrizCusto.length; i++){
+            String linha = itens[i];
+            for(int j = 0; i < matrizCusto[i].length; j++){
+                matrizCusto[i][j] = linha.charAt(j) + "";
+            }
+        }
+
         String textoItems = texto.replaceAll(" ", "");
 
         int qtdVertices = Integer.parseInt(textoItems.charAt(0) + "");
@@ -73,25 +84,30 @@ public class Principal {
             grafo.addVertice(v);
         }
 
-        String[][] matrizCustos = new String[textoItems.indexOf(";")][textoItems.indexOf(";")];
-
-        for(int i = 0; i < matrizCustos.length; i++){
-            for(int j = 0; j < matrizCustos[i].length; j++){
-                if(!(textoItems.charAt(j) == ';')){
-
+        //Cria arestas
+        for(int i = 0; i < matrizCusto.length; i++){
+            for(int j = 0; j < matrizCusto[i].length; j++){
+                if (!matrizCusto[i][j].equals("0") && !matrizCusto[i][j].equals("I")) {
+                    Aresta a = new Aresta(Double.parseDouble(matrizCusto[i][j] + ""), grafo.getById("V" + i), grafo.getById("V" + j));
+                    grafo.getById("V" + i).addAresta(a);
                 }
             }
         }
 
-
-
-        for(int i = 0; i < textoItems.length(); i++){
-            if(!textoItems.equals("I") && !textoItems.equals(("0"))){
-                grafo.getVertices().get(i);
-            }
-        }
         return grafo;
 
+    }
+
+    private static Vertice getVerticeById(Grafo grafo, String id){
+        Vertice v;
+        ArrayList<Vertice> lista = grafo.getVertices();
+        for(int i = 0; i < lista.size(); i++){
+            v = lista.get(i);
+            if(v.getId().equals(id)){
+                return v;
+            }
+        }
+        return null;
     }
 
     private static String[][] relax(int u, int v, int w) {
@@ -128,6 +144,15 @@ public class Principal {
 
         public void setVertices(ArrayList<Vertice> vertices) {
             this.vertices = vertices;
+        }
+
+        public Vertice getById(String id){
+            for(int i = 0; i < this.getVertices().size(); i++){
+                if(this.getVertices().get(i).getId().equals(id)){
+                    return this.getVertices().get(i);
+                }
+            }
+            return null;
         }
     }
 
