@@ -16,7 +16,7 @@ public class Principal {
 
         System.out.println(grafo.percorre());
 
-
+        grafo.percorreArestas();
 
 
 
@@ -57,26 +57,36 @@ public class Principal {
         texto = texto.replaceAll("\\(", "")
                 .replaceAll("\\)", "")
                 .replaceAll("\r", "")
-                .replaceAll("\n", " ; ");
+                .replaceAll("\n", ";");
 
-        String[] itens = texto.split(";");
-        String[][] matrizCusto = new String[itens[0].length()][itens[0].length()];
+        String[] linhaArquivo = texto.split(";");
+        int qtdVertices = Integer.parseInt(linhaArquivo[0].substring(0,1));
+
+        String verticeInicial = linhaArquivo[1].replaceAll(" ", "").substring(0,1);
+
+        String verticeOrigem = linhaArquivo[1].replaceAll(" ", "").substring(1,2);
+
+        String[][] matrizCusto = new String[linhaArquivo[2].replace(" ", "").length()]
+                                           [linhaArquivo[2].replace(" ", "").length()];
+
+        //Cria e povoa vetor, colocando cada linha da matriz de custo em uma posiçao do vetor
+        String[] itensLinha = new String[linhaArquivo.length - 2];
+        for(int i = 0; i < itensLinha.length; i++){
+            itensLinha[i] = linhaArquivo[i + 2].replace(" ", "");
+        }
 
         //Cria matriz de custo
         for(int i = 0; i < matrizCusto.length; i++){
-            String linha = itens[i];
-            for(int j = 0; i < matrizCusto[i].length; j++){
-                matrizCusto[i][j] = linha.charAt(j) + "";
+            String valoresDaLinha = itensLinha[i];
+            for(int j = 0; j < matrizCusto[i].length; j++){
+                matrizCusto[i][j] = valoresDaLinha.charAt(j) + "";
             }
         }
 
-        String textoItems = texto.replaceAll(" ", "");
-
-        int qtdVertices = Integer.parseInt(textoItems.charAt(0) + "");
-        textoItems = textoItems.replace(textoItems.substring(0,textoItems.indexOf(";") + 1), "");
+        percorre(matrizCusto);
 
         //Cria os todos os vertices
-        for(int i = 0; i < qtdVertices - 1; i++){
+        for(int i = 0; i < qtdVertices; i++){
 
             //Inicializa os vertices ja tendo o pai com nullo e o custo para chegar nele como infinito
             //igual ao metodo INITIALIZE-SINGLE-SOURCE porem feito na instanciaçao dos objetos de vertice
@@ -84,18 +94,42 @@ public class Principal {
             grafo.addVertice(v);
         }
 
+        grafo.percorre();
+
         //Cria arestas
         for(int i = 0; i < matrizCusto.length; i++){
             for(int j = 0; j < matrizCusto[i].length; j++){
                 if (!matrizCusto[i][j].equals("0") && !matrizCusto[i][j].equals("I")) {
-                    Aresta a = new Aresta(Double.parseDouble(matrizCusto[i][j] + ""), grafo.getById("V" + i), grafo.getById("V" + j));
-                    grafo.getById("V" + i).addAresta(a);
+                    Aresta a = new Aresta(Double.parseDouble(matrizCusto[i][j] + ""), grafo.getById(getAlfa(i + 1))
+                                                                                        , grafo.getById(getAlfa(j + 1)));
+                    grafo.getById(getAlfa(i)).addAresta(a);
                 }
             }
         }
 
         return grafo;
 
+    }
+
+    private static String getAlfa(int num){
+        switch (num){
+            case 1:
+                return "A";
+            case 2:
+                return "B";
+            case 3:
+                return "C";
+            case 4:
+                return "D";
+            case 5:
+                return "E";
+            case 6:
+                return "F";
+            case 7:
+                return "G";
+            default:
+                return null;
+        }
     }
 
     private static Vertice getVerticeById(Grafo grafo, String id){
@@ -130,6 +164,15 @@ public class Principal {
             this.vertices.add(v);
         }
 
+        public void percorreArestas(){
+            for(Vertice v : this.vertices){
+                for(Aresta a : v.getArestaAdj()){
+                    System.out.println("Origem: " + a.getOrigem().getId() +
+                            " Destino: " + a.getDestino().getId() +
+                            " Custo: " + a.custo);
+                }
+            }
+        }
         public String percorre(){
             String vertice = "";
             for(Vertice v : this.vertices){
