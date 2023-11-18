@@ -14,28 +14,19 @@ public class Principal {
         List<Aresta> listaArestas = null;
         Grafo grafo = iniciaGrafo();
 
-        System.out.println(grafo.percorre());
-
-        grafo.percorreArestas();
-
-
-
-        /*String[][] matriz = new String[][]{
-                {"0", "2", "-1", "-1", "10",},
-                {"-1", "0", "3", "-1", "7"},
-                {"-1", "-1", "0", "4", "-1"},
-                {"-1", "-1", "-1", "0", "-1"},
-                {"-1", "-1", "8", "5", "0"}
-        };
-
-        String[][] dij = initializeSingleSource(new String[2][matriz.length], 3);
-
-        percorre(dij);*/
-
-
+        System.out.println(dijkstra(grafo).length);
     }
 
+    public static String[] dijkstra(Grafo grafo){
+        Vertice origem = grafo.getById(getOrigem());
+        Vertice atual = grafo.getById(getOrigem());
+        String destino = getDestino();
 
+        for (int i = 0; i < atual.arestaAdj.size(); i++){
+
+        }
+        return null;
+    }
 
     /*
     * Faz a leitura da matriz do arquivo.txt e cria os vertices e arestas respectivas
@@ -94,7 +85,7 @@ public class Principal {
             grafo.addVertice(v);
         }
 
-        grafo.percorre();
+
 
         //Cria arestas
         for(int i = 0; i < matrizCusto.length; i++){
@@ -102,7 +93,7 @@ public class Principal {
                 if (!matrizCusto[i][j].equals("0") && !matrizCusto[i][j].equals("I")) {
                     Aresta a = new Aresta(Double.parseDouble(matrizCusto[i][j] + ""), grafo.getById(getAlfa(i + 1))
                                                                                         , grafo.getById(getAlfa(j + 1)));
-                    grafo.getById(getAlfa(i)).addAresta(a);
+                    grafo.getById(getAlfa(i + 1)).addAresta(a);
                 }
             }
         }
@@ -132,18 +123,51 @@ public class Principal {
         }
     }
 
-    private static Vertice getVerticeById(Grafo grafo, String id){
-        Vertice v;
-        ArrayList<Vertice> lista = grafo.getVertices();
-        for(int i = 0; i < lista.size(); i++){
-            v = lista.get(i);
-            if(v.getId().equals(id)){
-                return v;
-            }
+    public static String getOrigem(){
+        String texto;
+        Grafo grafo = new Grafo();
+        char[] alfa = new char[]{ 'A','B','C','D','E','F','G','H','I','J','K','L',};
+
+        try {
+            texto = Files.readString(Path.of("Arquivo.txt"), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Nao existe arquivo");
+
         }
-        return null;
+
+        //Organiza o texto do arquivo
+        texto = texto.replaceAll("\\(", "")
+                .replaceAll("\\)", "")
+                .replaceAll("\r", "")
+                .replaceAll("\n", ";");
+
+        String[] linhaArquivo = texto.split(";");
+
+        return linhaArquivo[1].replaceAll(" ", "").substring(0,1);
     }
 
+    public static String getDestino(){
+        String texto;
+        Grafo grafo = new Grafo();
+        char[] alfa = new char[]{ 'A','B','C','D','E','F','G','H','I','J','K','L',};
+
+        try {
+            texto = Files.readString(Path.of("Arquivo.txt"), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Nao existe arquivo");
+
+        }
+
+        //Organiza o texto do arquivo
+        texto = texto.replaceAll("\\(", "")
+                .replaceAll("\\)", "")
+                .replaceAll("\r", "")
+                .replaceAll("\n", ";");
+
+        String[] linhaArquivo = texto.split(";");
+
+        return linhaArquivo[1].replaceAll(" ", "").substring(1,2);
+    }
     private static String[][] relax(int u, int v, int w) {
         return null;
     }
@@ -173,7 +197,7 @@ public class Principal {
                 }
             }
         }
-        public String percorre(){
+        public String percorreVertice(){
             String vertice = "";
             for(Vertice v : this.vertices){
                 vertice += v.id + "\n" + "";
@@ -190,9 +214,9 @@ public class Principal {
         }
 
         public Vertice getById(String id){
-            for(int i = 0; i < this.getVertices().size(); i++){
-                if(this.getVertices().get(i).getId().equals(id)){
-                    return this.getVertices().get(i);
+            for(Vertice v : this.vertices){
+                if(v.getId().equals(id)){
+                    return v;
                 }
             }
             return null;
