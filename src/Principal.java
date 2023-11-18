@@ -22,6 +22,8 @@ public class Principal {
         Vertice atual = grafo.getById(getOrigem());
         String destino = getDestino();
 
+
+        //###########METODO RELAX
         ArrayList<Aresta> listaAdj = atual.getArestaAdj();
         double custoTotal;
         double custoAresta;
@@ -43,6 +45,7 @@ public class Principal {
                listaAdj.get(i).destino.pai = listaAdj.get(i).getDestino();
             }
         }
+        //############
         return null;
     }
 
