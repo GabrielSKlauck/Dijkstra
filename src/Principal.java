@@ -22,8 +22,26 @@ public class Principal {
         Vertice atual = grafo.getById(getOrigem());
         String destino = getDestino();
 
-        for (int i = 0; i < atual.arestaAdj.size(); i++){
+        ArrayList<Aresta> listaAdj = atual.getArestaAdj();
+        double custoTotal;
+        double custoAresta;
+        double custoPai;
+        double custoVertice;
 
+        for (int i = 0; i < listaAdj.size(); i++){
+            custoAresta = listaAdj.get(i).custo;
+            if(listaAdj.get(i).getOrigem().id.equals(origem.getId())){
+               custoPai = 0;
+            }else{
+                custoPai = listaAdj.get(i).getOrigem().getCusto();
+            }
+
+            custoTotal = custoAresta + custoPai;
+            custoVertice = listaAdj.get(i).getDestino().getCusto();
+            if(custoTotal < custoVertice){
+               listaAdj.get(i).destino.custo = custoTotal;
+               listaAdj.get(i).destino.pai = listaAdj.get(i).getDestino();
+            }
         }
         return null;
     }
@@ -268,7 +286,7 @@ public class Principal {
         private Double custo;
         private ArrayList<Aresta> arestaAdj = new ArrayList<>();
 
-        public Vertice(String id, Vertice pai, Double w) {
+        public Vertice(String id, Vertice pai, Double custo) {
             this.id = id;
             this.pai = pai;
             this.custo = custo;
