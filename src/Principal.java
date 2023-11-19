@@ -13,8 +13,8 @@ public class Principal {
     public static void main(String[] args) {
         List<Aresta> listaArestas = null;
         Grafo grafo = iniciaGrafo();
-
-        System.out.println(dijkstra(grafo).length);
+        dijkstra(grafo);
+        System.out.println(grafo.percorreVertice());
     }
 
     public static String[] dijkstra(Grafo grafo){
@@ -22,8 +22,14 @@ public class Principal {
         Vertice atual = grafo.getById(getOrigem());
         String destino = getDestino();
 
+        for(int i = 0; i < grafo.getVertices().size(); i++){
+             relax(grafo.getVertices().get(i), origem);
+        }
 
-        //###########METODO RELAX
+        return null;
+    }
+
+    private static Vertice relax(Vertice atual, Vertice origem){
         ArrayList<Aresta> listaAdj = atual.getArestaAdj();
         double custoTotal;
         double custoAresta;
@@ -33,20 +39,25 @@ public class Principal {
         for (int i = 0; i < listaAdj.size(); i++){
             custoAresta = listaAdj.get(i).custo;
             if(listaAdj.get(i).getOrigem().id.equals(origem.getId())){
-               custoPai = 0;
+                custoPai = 0;
             }else{
                 custoPai = listaAdj.get(i).getOrigem().getCusto();
             }
 
-            custoTotal = custoAresta + custoPai;
+            if(custoPai != Double.POSITIVE_INFINITY){
+                custoTotal = custoAresta + custoPai;
+            }else{
+                custoTotal = custoAresta + 0;
+            }
+
             custoVertice = listaAdj.get(i).getDestino().getCusto();
             if(custoTotal < custoVertice){
-               listaAdj.get(i).destino.custo = custoTotal;
-               listaAdj.get(i).destino.pai = listaAdj.get(i).getDestino();
+                listaAdj.get(i).destino.custo = custoTotal;
+                listaAdj.get(i).destino.pai = listaAdj.get(i).getOrigem();
             }
         }
-        //############
-        return null;
+        atual.setArestaAdj(listaAdj);
+        return atual;
     }
 
     /*
@@ -188,9 +199,6 @@ public class Principal {
         String[] linhaArquivo = texto.split(";");
 
         return linhaArquivo[1].replaceAll(" ", "").substring(1,2);
-    }
-    private static String[][] relax(int u, int v, int w) {
-        return null;
     }
 
     private static void percorre(String[][] matriz) {
