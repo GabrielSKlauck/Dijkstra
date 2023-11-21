@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class Principal {
@@ -19,12 +20,23 @@ public class Principal {
 
     public static String[] dijkstra(Grafo grafo){
         Vertice origem = grafo.getById(getOrigem());
-        Vertice atual = grafo.getById(getOrigem());
-        String destino = getDestino();
+        Vertice atual;
+        Vertice destino = grafo.getById(getDestino());
 
-        for(int i = 0; i < grafo.getVertices().size(); i++){
-             relax(grafo.getVertices().get(i), origem);
+        //lista de prioridade de vertice
+        Queue<Vertice> q = new PriorityQueue<>();
+
+        //lista de vertices com caminho minimo calculado
+        ArrayList<Vertice> s = new ArrayList<>();
+        q.add(origem);
+
+        while(!q.isEmpty()){
+            atual = q.remove();
+            s.add(atual);
+            atual = relax(atual, origem);
+
         }
+
 
         return null;
     }
@@ -60,6 +72,11 @@ public class Principal {
         return atual;
     }
 
+    public Vertice extractMin(Vertice v){
+        ArrayList<Aresta> listaAres = v.getArestaAdj();
+        listaAres.sort(null);
+        return listaAres.get(0).getDestino();
+    }
     /*
     * Faz a leitura da matriz do arquivo.txt e cria os vertices e arestas respectivas
     * do grafo
