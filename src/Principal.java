@@ -23,17 +23,35 @@ public class Principal {
         Vertice atual;
         Vertice destino = grafo.getById(getDestino());
 
+
         //lista de prioridade de vertice
-        Queue<Vertice> q = new PriorityQueue<>();
+        List<Vertice> q = new ArrayList<>();
+
 
         //lista de vertices com caminho minimo calculado
         ArrayList<Vertice> s = new ArrayList<>();
-        q.add(origem);
 
+
+        q.add(origem);
+        ArrayList<Vertice> verticesMod;
+        String aux;
         while(!q.isEmpty()){
-            atual = q.remove();
+            atual = q.remove(0);
             s.add(atual);
-            atual = relax(atual, origem);
+            verticesMod = relax(atual, origem);
+
+            //PERCORRE ARESTAS ADJ DO VERTICE PIVO RELAXADAS
+            for(int i = 0; i < verticesMod.size(); i++){
+                for(int j = 0; j < grafo.getVertices().size(); j++){
+                    aux = grafo.getVertices().get(j).getId();
+                    if(aux.equals(verticesMod.get(i).getId())){
+                        grafo.getVertices().get(j).setPai(verticesMod.get(i).getPai());
+                        grafo.getVertices().get(j).setCusto(verticesMod.get(i).getCusto());
+                    }
+                }
+
+
+            }
 
         }
 
@@ -41,7 +59,9 @@ public class Principal {
         return null;
     }
 
-    private static Vertice relax(Vertice atual, Vertice origem){
+    //RETORNA A LISTA DE VERTICES RELAXADOS
+    private static ArrayList<Vertice> relax(Vertice atual, Vertice origem){
+        ArrayList<Vertice> verticeAlt = new ArrayList<>();
         ArrayList<Aresta> listaAdj = atual.getArestaAdj();
         double custoTotal;
         double custoAresta;
@@ -66,10 +86,11 @@ public class Principal {
             if(custoTotal < custoVertice){
                 listaAdj.get(i).destino.custo = custoTotal;
                 listaAdj.get(i).destino.pai = listaAdj.get(i).getOrigem();
+                verticeAlt.add(listaAdj.get(i).getDestino());
             }
         }
         atual.setArestaAdj(listaAdj);
-        return atual;
+        return verticeAlt;
     }
 
     public Vertice extractMin(Vertice v){
