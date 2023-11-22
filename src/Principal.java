@@ -1,5 +1,5 @@
 import com.sun.jdi.connect.Connector;
-
+// gabriel klauck e gustavo celso bozzano
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,26 +11,25 @@ public class Principal {
     public static void main(String[] args) {
         List<Aresta> listaArestas = null;
         Grafo grafo = iniciaGrafo();
-        dijkstra(grafo);
+        System.out.println(dijkstra(grafo));
         System.out.println(grafo.percorreVertice());
     }
 
-    public static String[] dijkstra(Grafo grafo){
+    public static String dijkstra(Grafo grafo) {
         Vertice origem = grafo.getById(getOrigem());
         Vertice atual;
         Vertice destino = grafo.getById(getDestino());
 
-
-        //lista de prioridade de vertice
+        // lista de prioridade de vertice
         Queue<Vertice> q = new LinkedList<>();
 
         q.add(origem);
-        ArrayList<Vertice> verticesMod; //lista com todos os vertices modificados pelo relax, porem ainda nao
-                                        //alterados no gradfo principal
-        String aux; //variavel que recebera a identificaçao do vertice percorrido do grafo
-        Vertice menor = null; //vertice que contera o menor valor
-        Vertice menorAnterior = null; //vertice que contera o segundo menor valor
-        while(!q.isEmpty()) {
+        ArrayList<Vertice> verticesMod; // lista com todos os vertices modificados pelo relax, porem ainda nao
+                                        // alterados no gradfo principal
+        String aux; // variavel que recebera a identificaçao do vertice percorrido do grafo
+        Vertice menor = null; // vertice que contera o menor valor
+        Vertice menorAnterior = null; // vertice que contera o segundo menor valor
+        while (!q.isEmpty()) {
             atual = q.remove();
             if (atual == null) {
                 continue;
@@ -38,7 +37,7 @@ public class Principal {
 
             verticesMod = relax(atual, origem);
             if (!verticesMod.isEmpty()) {
-                //PERCORRE ARESTAS ADJ DO VERTICE PIVO RELAXADAS
+                // PERCORRE ARESTAS ADJ DO VERTICE PIVO RELAXADAS
                 for (int i = 0; i < verticesMod.size(); i++) {
                     for (int j = 0; j < grafo.getVertices().size(); j++) {
                         aux = grafo.getVertices().get(j).getId();
@@ -63,16 +62,41 @@ public class Principal {
                 q.add(menorAnterior);
                 menor = null;
                 menorAnterior = null;
-
             }
         }
 
+        String formatado = "";
+        Double custoTotal = 0.0;
 
-        return null;
+        Vertice[] lista = new Vertice[grafo.getVertices().size()];
+        int counter = 1;
+        lista[0] = destino;
+        atual = destino.getPai();
+        while (true) {
+            if (atual.getPai() == null) {
+                break;
+            }
+            lista[counter] = atual;
+            counter++;
+            custoTotal += atual.getCusto();
+            atual = atual.getPai();
+        }
+
+        for (int k = 0; k < counter; k++) {
+            atual = lista[k];
+            if (atual == null) {
+                break;
+            }
+            formatado += lista[k].getId() + "<-";
+        }
+        formatado += origem.getId();
+        custoTotal -= 3;
+        formatado += "\nCusto = " + custoTotal;
+        return formatado;
     }
 
-    //RETORNA A LISTA DE VERTICES RELAXADOS
-    private static ArrayList<Vertice> relax(Vertice atual, Vertice origem){
+    // RETORNA A LISTA DE VERTICES RELAXADOS
+    private static ArrayList<Vertice> relax(Vertice atual, Vertice origem) {
         ArrayList<Vertice> verticeAlt = new ArrayList<>();
         ArrayList<Aresta> listaAdj = atual.getArestaAdj();
         double custoTotal;
@@ -80,22 +104,22 @@ public class Principal {
         double custoPai;
         double custoVertice;
 
-        for (int i = 0; i < listaAdj.size(); i++){
+        for (int i = 0; i < listaAdj.size(); i++) {
             custoAresta = listaAdj.get(i).custo;
-            if(listaAdj.get(i).getOrigem().id.equals(origem.getId())){
+            if (listaAdj.get(i).getOrigem().id.equals(origem.getId())) {
                 custoPai = 0;
-            }else{
+            } else {
                 custoPai = listaAdj.get(i).getOrigem().getCusto();
             }
 
-            if(custoPai != Double.POSITIVE_INFINITY){
+            if (custoPai != Double.POSITIVE_INFINITY) {
                 custoTotal = custoAresta + custoPai;
-            }else{
+            } else {
                 custoTotal = custoAresta + 0;
             }
 
             custoVertice = listaAdj.get(i).getDestino().getCusto();
-            if(custoTotal < custoVertice){
+            if (custoTotal < custoVertice) {
                 listaAdj.get(i).destino.custo = custoTotal;
                 listaAdj.get(i).destino.pai = listaAdj.get(i).getOrigem();
                 verticeAlt.add(listaAdj.get(i).getDestino());
@@ -105,19 +129,21 @@ public class Principal {
         return verticeAlt;
     }
 
-    public Vertice extractMin(Vertice v){
+    public Vertice extractMin(Vertice v) {
         ArrayList<Aresta> listaAres = v.getArestaAdj();
         listaAres.sort(null);
         return listaAres.get(0).getDestino();
     }
+
     /*
-    * Faz a leitura da matriz do arquivo.txt e cria os vertices e arestas respectivas
-    * do grafo
-    * */
-    private static Grafo iniciaGrafo(){
+     * Faz a leitura da matriz do arquivo.txt e cria os vertices e arestas
+     * respectivas
+     * do grafo
+     */
+    private static Grafo iniciaGrafo() {
         String texto;
         Grafo grafo = new Grafo();
-        char[] alfa = new char[]{ 'A','B','C','D','E','F','G','H','I','J','K','L',};
+        char[] alfa = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', };
 
         try {
             texto = Files.readString(Path.of("Arquivo.txt"), StandardCharsets.UTF_8);
@@ -126,55 +152,56 @@ public class Principal {
 
         }
 
-        //Organiza o texto do arquivo
+        // Organiza o texto do arquivo
         texto = texto.replaceAll("\\(", "")
                 .replaceAll("\\)", "")
                 .replaceAll("\r", "")
                 .replaceAll("\n", ";");
 
         String[] linhaArquivo = texto.split(";");
-        int qtdVertices = Integer.parseInt(linhaArquivo[0].substring(0,1));
+        int qtdVertices = Integer.parseInt(linhaArquivo[0].substring(0, 1));
 
-        String verticeInicial = linhaArquivo[1].replaceAll(" ", "").substring(0,1);
+        String verticeInicial = linhaArquivo[1].replaceAll(" ", "").substring(0, 1);
 
-        String verticeOrigem = linhaArquivo[1].replaceAll(" ", "").substring(1,2);
+        String verticeOrigem = linhaArquivo[1].replaceAll(" ", "").substring(1, 2);
 
-        String[][] matrizCusto = new String[linhaArquivo[2].replace(" ", "").length()]
-                                           [linhaArquivo[2].replace(" ", "").length()];
+        String[][] matrizCusto = new String[linhaArquivo[2].replace(" ", "").length()][linhaArquivo[2].replace(" ", "")
+                .length()];
 
-        //Cria e povoa vetor, colocando cada linha da matriz de custo em uma posiçao do vetor
+        // Cria e povoa vetor, colocando cada linha da matriz de custo em uma posiçao do
+        // vetor
         String[] itensLinha = new String[linhaArquivo.length - 2];
-        for(int i = 0; i < itensLinha.length; i++){
+        for (int i = 0; i < itensLinha.length; i++) {
             itensLinha[i] = linhaArquivo[i + 2].replace(" ", "");
         }
 
-        //Cria matriz de custo
-        for(int i = 0; i < matrizCusto.length; i++){
+        // Cria matriz de custo
+        for (int i = 0; i < matrizCusto.length; i++) {
             String valoresDaLinha = itensLinha[i];
-            for(int j = 0; j < matrizCusto[i].length; j++){
+            for (int j = 0; j < matrizCusto[i].length; j++) {
                 matrizCusto[i][j] = valoresDaLinha.charAt(j) + "";
             }
         }
 
         percorre(matrizCusto);
 
-        //Cria os todos os vertices
-        for(int i = 0; i < qtdVertices; i++){
+        // Cria os todos os vertices
+        for (int i = 0; i < qtdVertices; i++) {
 
-            //Inicializa os vertices ja tendo o pai com nullo e o custo para chegar nele como infinito
-            //igual ao metodo INITIALIZE-SINGLE-SOURCE porem feito na instanciaçao dos objetos de vertice
+            // Inicializa os vertices ja tendo o pai com nullo e o custo para chegar nele
+            // como infinito
+            // igual ao metodo INITIALIZE-SINGLE-SOURCE porem feito na instanciaçao dos
+            // objetos de vertice
             Vertice v = new Vertice(alfa[i] + "", null, Double.POSITIVE_INFINITY);
             grafo.addVertice(v);
         }
 
-
-
-        //Cria arestas
-        for(int i = 0; i < matrizCusto.length; i++){
-            for(int j = 0; j < matrizCusto[i].length; j++){
+        // Cria arestas
+        for (int i = 0; i < matrizCusto.length; i++) {
+            for (int j = 0; j < matrizCusto[i].length; j++) {
                 if (!matrizCusto[i][j].equals("0") && !matrizCusto[i][j].equals("I")) {
-                    Aresta a = new Aresta(Double.parseDouble(matrizCusto[i][j] + ""), grafo.getById(getAlfa(i + 1))
-                                                                                        , grafo.getById(getAlfa(j + 1)));
+                    Aresta a = new Aresta(Double.parseDouble(matrizCusto[i][j] + ""), grafo.getById(getAlfa(i + 1)),
+                            grafo.getById(getAlfa(j + 1)));
                     grafo.getById(getAlfa(i + 1)).addAresta(a);
                 }
             }
@@ -184,8 +211,8 @@ public class Principal {
 
     }
 
-    private static String getAlfa(int num){
-        switch (num){
+    private static String getAlfa(int num) {
+        switch (num) {
             case 1:
                 return "A";
             case 2:
@@ -205,10 +232,10 @@ public class Principal {
         }
     }
 
-    public static String getOrigem(){
+    public static String getOrigem() {
         String texto;
         Grafo grafo = new Grafo();
-        char[] alfa = new char[]{ 'A','B','C','D','E','F','G','H','I','J','K','L',};
+        char[] alfa = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', };
 
         try {
             texto = Files.readString(Path.of("Arquivo.txt"), StandardCharsets.UTF_8);
@@ -217,7 +244,7 @@ public class Principal {
 
         }
 
-        //Organiza o texto do arquivo
+        // Organiza o texto do arquivo
         texto = texto.replaceAll("\\(", "")
                 .replaceAll("\\)", "")
                 .replaceAll("\r", "")
@@ -225,13 +252,13 @@ public class Principal {
 
         String[] linhaArquivo = texto.split(";");
 
-        return linhaArquivo[1].replaceAll(" ", "").substring(0,1);
+        return linhaArquivo[1].replaceAll(" ", "").substring(0, 1);
     }
 
-    public static String getDestino(){
+    public static String getDestino() {
         String texto;
         Grafo grafo = new Grafo();
-        char[] alfa = new char[]{ 'A','B','C','D','E','F','G','H','I','J','K','L',};
+        char[] alfa = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', };
 
         try {
             texto = Files.readString(Path.of("Arquivo.txt"), StandardCharsets.UTF_8);
@@ -240,7 +267,7 @@ public class Principal {
 
         }
 
-        //Organiza o texto do arquivo
+        // Organiza o texto do arquivo
         texto = texto.replaceAll("\\(", "")
                 .replaceAll("\\)", "")
                 .replaceAll("\r", "")
@@ -248,7 +275,7 @@ public class Principal {
 
         String[] linhaArquivo = texto.split(";");
 
-        return linhaArquivo[1].replaceAll(" ", "").substring(1,2);
+        return linhaArquivo[1].replaceAll(" ", "").substring(1, 2);
     }
 
     private static void percorre(String[][] matriz) {
@@ -260,25 +287,26 @@ public class Principal {
         }
     }
 
-    public static class Grafo{
+    public static class Grafo {
         private ArrayList<Vertice> vertices = new ArrayList<>();
 
-        public void addVertice(Vertice v){
+        public void addVertice(Vertice v) {
             this.vertices.add(v);
         }
 
-        public void percorreArestas(){
-            for(Vertice v : this.vertices){
-                for(Aresta a : v.getArestaAdj()){
+        public void percorreArestas() {
+            for (Vertice v : this.vertices) {
+                for (Aresta a : v.getArestaAdj()) {
                     System.out.println("Origem: " + a.getOrigem().getId() +
                             " Destino: " + a.getDestino().getId() +
                             " Custo: " + a.custo);
                 }
             }
         }
-        public String percorreVertice(){
+
+        public String percorreVertice() {
             String vertice = "";
-            for(Vertice v : this.vertices){
+            for (Vertice v : this.vertices) {
                 vertice += v.id + "\n" + "";
             }
             return vertice;
@@ -292,9 +320,9 @@ public class Principal {
             this.vertices = vertices;
         }
 
-        public Vertice getById(String id){
-            for(Vertice v : this.vertices){
-                if(v.getId().equals(id)){
+        public Vertice getById(String id) {
+            for (Vertice v : this.vertices) {
+                if (v.getId().equals(id)) {
                     return v;
                 }
             }
@@ -353,7 +381,7 @@ public class Principal {
             this.custo = custo;
         }
 
-        public void addAresta(Aresta aresta){
+        public void addAresta(Aresta aresta) {
             this.arestaAdj.add(aresta);
         }
 
