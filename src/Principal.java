@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class Principal {
     public static void main(String[] args) {
@@ -25,34 +22,49 @@ public class Principal {
 
 
         //lista de prioridade de vertice
-        List<Vertice> q = new ArrayList<>();
-
-
-        //lista de vertices com caminho minimo calculado
-        ArrayList<Vertice> s = new ArrayList<>();
-
+        Queue<Vertice> q = new LinkedList<>();
 
         q.add(origem);
-        ArrayList<Vertice> verticesMod;
-        String aux;
-        while(!q.isEmpty()){
-            atual = q.remove(0);
-            s.add(atual);
-            verticesMod = relax(atual, origem);
+        ArrayList<Vertice> verticesMod; //lista com todos os vertices modificados pelo relax, porem ainda nao
+                                        //alterados no gradfo principal
+        String aux; //variavel que recebera a identificaçao do vertice percorrido do grafo
+        Vertice menor = null; //vertice que contera o menor valor
+        Vertice menorAnterior = null; //vertice que contera o segundo menor valor
+        while(!q.isEmpty()) {
+            atual = q.remove();
+            if (atual == null) {
+                continue;
+            }
 
-            //PERCORRE ARESTAS ADJ DO VERTICE PIVO RELAXADAS
-            for(int i = 0; i < verticesMod.size(); i++){
-                for(int j = 0; j < grafo.getVertices().size(); j++){
-                    aux = grafo.getVertices().get(j).getId();
-                    if(aux.equals(verticesMod.get(i).getId())){
-                        grafo.getVertices().get(j).setPai(verticesMod.get(i).getPai());
-                        grafo.getVertices().get(j).setCusto(verticesMod.get(i).getCusto());
+            verticesMod = relax(atual, origem);
+            if (!verticesMod.isEmpty()) {
+                //PERCORRE ARESTAS ADJ DO VERTICE PIVO RELAXADAS
+                for (int i = 0; i < verticesMod.size(); i++) {
+                    for (int j = 0; j < grafo.getVertices().size(); j++) {
+                        aux = grafo.getVertices().get(j).getId();
+                        if (aux.equals(verticesMod.get(i).getId())) {
+                            grafo.getVertices().get(j).setPai(verticesMod.get(i).getPai());
+                            grafo.getVertices().get(j).setCusto(verticesMod.get(i).getCusto());
+
+                            if (menor == null) {
+                                menor = verticesMod.get(i);
+                            } else {
+                                if (verticesMod.get(i).getCusto() < menor.getCusto()) {
+                                    menorAnterior = menor;
+                                    menor = verticesMod.get(i);
+                                }
+                            }
+
+                        }
                     }
                 }
 
+                q.add(menor);
+                q.add(menorAnterior);
+                menor = null;
+                menorAnterior = null;
 
             }
-
         }
 
 
