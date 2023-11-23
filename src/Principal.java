@@ -12,7 +12,6 @@ public class Principal {
         List<Aresta> listaArestas = null;
         Grafo grafo = iniciaGrafo();
         System.out.println(dijkstra(grafo));
-        System.out.println(grafo.percorreVertice());
     }
 
     public static String dijkstra(Grafo grafo) {
@@ -87,9 +86,10 @@ public class Principal {
             if (atual == null) {
                 break;
             }
-            formatado += lista[k].getId() + "<-";
+            formatado = lista[k].getId() + "->" + formatado;
         }
-        formatado += origem.getId();
+        formatado = origem.getId() + "->"+ formatado;
+        formatado = formatado.substring(0,formatado.length()-2);
         custoTotal -= 3;
         formatado += "\nCusto = " + custoTotal;
         return formatado;
@@ -182,8 +182,6 @@ public class Principal {
                 matrizCusto[i][j] = valoresDaLinha.charAt(j) + "";
             }
         }
-
-        percorre(matrizCusto);
 
         // Cria os todos os vertices
         for (int i = 0; i < qtdVertices; i++) {
